@@ -1,0 +1,50 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "espidf",
+      "name": "ESP-IDF Launch",
+      "request": "launch",
+      "tmoScaleFactor": 4
+    },
+    {
+      "type": "espidf",
+      "name": "Launch",
+      "request": "launch",
+      "debugPort": 9998,
+      "logLevel": 2,
+      "mode": "manual",
+      "verifyAppBinBeforeDebug": false,
+      "tmoScaleFactor": 1,
+      "initGdbCommands": [
+        "set remote hardware-watchpoint-limit 2",
+        "target remote :3333",
+        "mon reset halt",
+        "maintenance flush register-cache",
+        "thb app_main",
+        "c"
+      ],
+        // "symbol-file /path/to/program.elf",
+      "env": {
+        "CUSTOM_ENV_VAR": "SOME_VALUE"
+      }
+    },
+    {
+      "name": "Launch GDB ESP32",
+      "type": "cppdbg",
+      "request": "launch",
+      "cwd": "${workspaceFolder}/build",
+      "program": "${workspaceFolder}/build/espnow_example.elf",
+      // Could specify direct path to .espressif tools instead of the command
+      "miDebuggerPath": "${command:espIdf.getXtensaGdb}",
+      "setupCommands": [
+        { "text": "target extended-remote :3333" },
+        { "text": "set remote hardware-watchpoint-limit 2"},
+        { "text": "mon reset halt" },
+        { "text": "maintenance flush register-cache" },
+        { "text": "thb app_main" },
+      ]
+    }
+
+  ]
+}
