@@ -11,7 +11,7 @@
       "type": "espidf",
       "name": "Launch",
       "request": "launch",
-      "debugPort": 9998,
+      // "debugPort": 9998,
       "logLevel": 2,
       "mode": "manual",
       "verifyAppBinBeforeDebug": false,
@@ -38,13 +38,32 @@
       // Could specify direct path to .espressif tools instead of the command
       "miDebuggerPath": "${command:espIdf.getXtensaGdb}",
       "setupCommands": [
+        { "text": "source ${workspaceFolder}/gdbinit" }
+        // { "text": "target extended-remote :3333" },
+        // { "text": "set remote hardware-watchpoint-limit 2"},
+        // { "text": "mon reset halt" },
+        // { "text": "maintenance flush register-cache" },
+        // { "text": "thb app_main" },
+      ]
+    },
+    {
+      "name": "(gdb) Attach ESP32",
+      "type": "cppdbg",
+      "request": "attach",
+      "debugServer": 3333,
+      "program": "${workspaceFolder}/build/espnow_example.elf",
+      "MIMode": "gdb",
+      "miDebuggerPath": "${command:espIdf.getXtensaGdb}",
+      // "cwd": "${workspaceFolder}/build",
+      "setupCommands": [
         { "text": "target extended-remote :3333" },
         { "text": "set remote hardware-watchpoint-limit 2"},
-        { "text": "mon reset halt" },
-        { "text": "maintenance flush register-cache" },
-        { "text": "thb app_main" },
+        // { "text": "mon reset halt" },
+        // { "text": "maintenance flush register-cache" },
+        // { "text": "thb app_main" },
       ]
     }
+
 
   ]
 }

@@ -1,2 +1,2 @@
-idf_component_register(SRCS "espnow_remote_test.c" "espnow_example_main.c"
-                    INCLUDE_DIRS ".")
+idf_component_register(SRCS "main.c" "espnow_remote.c"
+                    INCLUDE_DIRS "." "../include")

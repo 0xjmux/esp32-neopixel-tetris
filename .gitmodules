@@ -1,0 +1,3 @@
+[submodule "components/tetris"]
+	path = components/tetris
+	url = git@github.com:0xjmux/tetris.git

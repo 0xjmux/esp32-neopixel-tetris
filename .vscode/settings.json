@@ -1,7 +1,18 @@
 {
   "C_Cpp.intelliSenseEngine": "default",
   "files.associations": {
-    "espnow_example.h": "c"
+    "espnow_example.h": "c",
+    "espnow_remote_test.h": "c",
+    "esp_app_trace.h": "c",
+    "espnow_remote.h": "c",
+    "esp_random.h": "c",
+    "timers.h": "c",
+    "semphr.h": "c",
+    "esp_netif.h": "c",
+    "esp_wifi.h": "c",
+    "esp_event.h": "c",
+    "nvs_flash.h": "c",
+    "esp_mac.h": "c"
   },
   "idf.adapterTargetName": "esp32s3",
   "idf.openOcdConfigs": [
