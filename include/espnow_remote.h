@@ -121,7 +121,7 @@ void get_button_name_from_number(const uint8_t button, char *button_name_str);
      uint32_t *seq, uint8_t *button);
 */
 
-void espnow_recv_task(void *pvParameter);
+// void espnow_recv_task(void *pvParameter);
 esp_err_t espnow_remote_recv_init(void);
 void espnow_remote_recv_deinit(void);
 

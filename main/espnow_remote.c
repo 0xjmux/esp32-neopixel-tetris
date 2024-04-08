@@ -193,8 +193,7 @@ static uint8_t example_espnow_data_parse(uint8_t *data, uint16_t data_len, uint8
 /**
  * FreeRTOS task to handle data reception
 */
-// static void espnow_recv_task(void *pvParameter)
-void espnow_recv_task(void *pvParameter)
+static void espnow_recv_task(void *pvParameter)
 {
 
 
@@ -218,8 +217,6 @@ void espnow_recv_task(void *pvParameter)
         // original data not needed since we've parsed out the parts we want
         ESP_LOGD(TAG, "Freeing recv_cb.data %p", recv_cb.data);
         free(recv_cb.data);
-
-
 
 
         if (ret == DATA_PARSE_OK) {

@@ -5,8 +5,10 @@ build/
 *.a
 *.swp
 .devcontainer/
-*.old
+sdkconfig.old
+sdkconfig
 sdkconfig.old.*
 .vscode/
 espnow_remote_test_clean.c
 initial_attempt*
+managed_components/

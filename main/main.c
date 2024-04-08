@@ -17,6 +17,7 @@
 #include "defs.h"
 #include "espnow_remote.h"
 #include "tetris.h"
+#include "neopixel.h"       // fast neopixel library
 
 
 /**
@@ -148,7 +149,7 @@ void app_main(void)
     espnow_remote_recv_init();
 
     // start game loop task
-    TaskHandle_t tetris_task_handle = NULL;
-    xTaskCreate(tetris_game_loop_task, "tetris_game_loop_task", TASK_STACK_DEPTH_BYTES, NULL, 4, &tetris_task_handle);
-    ESP_LOGI(TAG, "Tetris task created with handle %p", tetris_task_handle);
+    // TaskHandle_t tetris_task_handle = NULL;
+    // xTaskCreate(tetris_game_loop_task, "tetris_game_loop_task", TASK_STACK_DEPTH_BYTES, NULL, 4, &tetris_task_handle);
+    // ESP_LOGI(TAG, "Tetris task created with handle %p", tetris_task_handle);
 }

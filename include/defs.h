@@ -8,7 +8,11 @@
 #define TAG "esp32-neopixel-tetris"
 
 #define STAT_LED_PIN 2
-#define LED_DATA_PIN 21
+
+#define NEOPIXEL_PIN 21
+#define PIXEL_COUNT 8*32
+
+
 
 
 ////////////////////////////////////////
