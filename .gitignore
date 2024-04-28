@@ -12,3 +12,4 @@ sdkconfig.old.*
 espnow_remote_test_clean.c
 initial_attempt*
 managed_components/
+unity-app/

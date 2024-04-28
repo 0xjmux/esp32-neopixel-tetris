@@ -7,7 +7,14 @@
 #include "tetris.h"
 #include "neopixel.h"
 
+
 #define NUM_TETRIS_COLORS NUM_TETROMINOS + 1
+
+// LED numbers
+#define TOP_RIGHT_LED 0
+#define BOT_RIGHT_LED 255
+#define TOP_LEFT_LED 7
+#define BOT_LEFT_LED 248
 
 /**
  * match tetris's `piece_colors` enum to a 32bit neopixel color value

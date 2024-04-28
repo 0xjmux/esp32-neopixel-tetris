@@ -5,6 +5,7 @@
 
 #include "neopixel_display.h"
 
+
 /**
  * Panel information:
  * for my 8x32 panel, LED #0 is at the top right of the display, and then
@@ -17,6 +18,8 @@
 #define BOT_RIGHT_LED 255
 #define TOP_LEFT_LED 7
 #define BOT_LEFT_LED 248
+
+tNeopixelContext neopixels;
 
 /**
  * for a given row,col compute the position of that LED on the LED matrix
@@ -32,7 +35,8 @@ void tetrisBoard_to_neopixel_matrix(TetrisBoard *tb) {
 // void init_neopixel_display_colors
 
 void neopixel_display_setup(void) {
-    tNeopixelContext neopixels = neopixel_Init(PIXEL_COUNT, NEOPIXEL_PIN);
+    neopixels = neopixel_Init(PIXEL_COUNT, NEOPIXEL_PIN);
+    //tNeopixel contains {index, RGB} both uint32_t
 
 }
 
