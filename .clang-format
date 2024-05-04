@@ -1,0 +1,8 @@
+---
+Language: Cpp
+BasedOnStyle: Google
+IndentWidth: 2
+AlignConsecutiveBitFields: true
+AlignConsecutiveMacros: true
+AlignConsecutiveAssignments: true
+...
