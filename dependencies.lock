@@ -4,12 +4,24 @@ dependencies:
     source:
       type: idf
     version: 5.2.1
-  zorxx__neopixel:
+  neopixel:
     component_hash: null
     source:
-      path: /home/jmux/Github/Neopixel-Matrix-Tetris-Project/esp32-neopixel-tetris/components/zorxx__neopixel
+      path: /home/jmux/Github/Neopixel-Matrix-Tetris-Project/esp32-neopixel-tetris/components/neopixel
       type: local
     version: 1.0.4
-manifest_hash: c8f40733025236ea5d252fb5ee26d4b35ddebcb9746a0cc7196ab9f00192c1b3
+  neopixel_display:
+    component_hash: null
+    source:
+      path: /home/jmux/Github/Neopixel-Matrix-Tetris-Project/esp32-neopixel-tetris/components/neopixel_display
+      type: local
+    version: '*'
+  tetris:
+    component_hash: null
+    source:
+      path: /home/jmux/Github/Neopixel-Matrix-Tetris-Project/esp32-neopixel-tetris/components/tetris
+      type: local
+    version: 1.0.0
+manifest_hash: 97c19af51715669289ad8a809733583a6c1e18a58035ff0a421caee13bb8bdbc
 target: esp32s3
 version: 1.0.0

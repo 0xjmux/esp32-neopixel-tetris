@@ -1,6 +1,13 @@
 ## IDF Component Manager Manifest File
 dependencies:
   zorxx/neopixel: "^1.0.4"
+  0xjmux/tetris: 
+    path: ../components/tetris
+    git: git@github.com:0xjmux/tetris.git
+  neopixel_display:
+    path: ../components/neopixel_display
+
+  #version: ">=1.0.0"
   ## Required IDF version
   idf:
     version: ">=4.1.0"
