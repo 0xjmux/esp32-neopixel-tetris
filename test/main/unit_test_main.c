@@ -41,7 +41,7 @@ void app_main(void)
 
     printf("Finished all tests - not showing interactive menu because it's broken on the ESP32S3\n");
     while (1) {
-        vTaskDelay(1000);
+        // vTaskDelay(1000);
     }
     exit(0);
 }

@@ -13,11 +13,12 @@
 #include "esp_log.h"
 #include "esp_now.h"
 
+#include "neopixel.h"       // fast neopixel library
 
-#include "defs.h"
+#include "npix_tetris_defs.h"
 #include "espnow_remote.h"
 #include "tetris.h"
-#include "neopixel.h"       // fast neopixel library
+#include "neopixel_display.h"       // my neopixel array driver
 
 
 /**
@@ -30,12 +31,13 @@ void tetris_game_loop_task(void *pvParameter) {
 
     bool game_paused = false;
 
+    tNeopixelContext neopixels = neopixel_Init(PIXEL_COUNT, NEOPIXEL_PIN);
 
     tg = create_game();
     enum player_move move = T_NONE;
     create_rand_piece(tg);      // create first piece
 
-
+    display_board(&neopixels, &tg->active_board);
 
     while (!tg->game_over && move != T_QUIT) {
 
@@ -43,7 +45,7 @@ void tetris_game_loop_task(void *pvParameter) {
         if(game_paused) {
             // check if we've unpaused by now
             if(get_buttons_state().button_val == WIZMOTE_BUTTON_NIGHT) {
-                panic_toggle_stat_led(0);
+                set_stat_led_state(0);
                 reset_internal_buttons_state();
                 ESP_LOGI(TAG, "GAME UNPAUSED");
                 game_paused= false;
@@ -60,6 +62,7 @@ void tetris_game_loop_task(void *pvParameter) {
         // all the driver really has to do is pass `move` along to it and then print out
         //  the tg->active_board array in whatever format is desired
         tg_tick(tg, move);
+        display_board(&neopixels, &tg->active_board);
 
         switch(buttons_state.button_val) {
             case (WIZMOTE_BUTTON_ON):               // 
@@ -72,9 +75,9 @@ void tetris_game_loop_task(void *pvParameter) {
                 break;
             case (WIZMOTE_BUTTON_NIGHT):            // PAUSE
                 strcpy(button_name_str, "PAUSE (night)");
+                set_stat_led_state(1);
                 game_paused = true;
                 ESP_LOGI(TAG, "GAME PAUSED!");
-                panic_toggle_stat_led(1);
 
                 move = T_NONE;
                 break;
@@ -117,9 +120,9 @@ void tetris_game_loop_task(void *pvParameter) {
 
     }
 
+    ESP_LOGI(TAG, "Game over! Level=%ld, Score=%ld\n", tg->level, tg->score);
     // if we're here, game is over; dealloc tg
     end_game(tg);
-    ESP_LOGI(TAG, "Game over! Level=%ld, Score=%ld\n", tg->level, tg->score);
     assert(0 && "reached end of game loop!");
 }
 
@@ -149,7 +152,7 @@ void app_main(void)
     espnow_remote_recv_init();
 
     // start game loop task
-    // TaskHandle_t tetris_task_handle = NULL;
-    // xTaskCreate(tetris_game_loop_task, "tetris_game_loop_task", TASK_STACK_DEPTH_BYTES, NULL, 4, &tetris_task_handle);
-    // ESP_LOGI(TAG, "Tetris task created with handle %p", tetris_task_handle);
+    TaskHandle_t tetris_task_handle = NULL;
+    xTaskCreate(tetris_game_loop_task, "tetris_game_loop_task", TASK_STACK_DEPTH_BYTES, NULL, 4, &tetris_task_handle);
+    ESP_LOGI(TAG, "Tetris task created with handle %p", tetris_task_handle);
 }

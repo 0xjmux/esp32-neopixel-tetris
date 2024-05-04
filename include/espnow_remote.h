@@ -2,7 +2,7 @@
 #define ESPNOW_REMOTE_H
 
 #include <stdint.h>
-#include "defs.h"
+#include "npix_tetris_defs.h"
 
 // temporary constants (bc there has to be defaults in esp-idf, right?)
 #define STR_MAX_LEN 256
@@ -113,7 +113,7 @@ typedef struct remote_button_info {
 
 void example_wifi_init(void);
 
-void panic_toggle_stat_led(bool ledState);
+void set_stat_led_state(bool ledState);
 
 void get_button_name_from_number(const uint8_t button, char *button_name_str);
 

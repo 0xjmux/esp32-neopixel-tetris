@@ -10,8 +10,12 @@
 #define STAT_LED_PIN 2
 
 #define NEOPIXEL_PIN 21
-#define PIXEL_COUNT 8*32
 
+
+#define DISPLAY_ROWS 32
+#define DISPLAY_COLS 8
+
+#define PIXEL_COUNT DISPLAY_ROWS*DISPLAY_COLS
 
 
 
