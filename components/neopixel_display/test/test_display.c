@@ -12,6 +12,7 @@
 
 #define DELAY_1000MS (1000 / portTICK_PERIOD_MS)
 
+void setRingFromOutsideToColor(TetrisBoard *tb, uint8_t rings_from_outside, int8_t color);
 
 // allow iterating through cell colors
 const int8_t all_cell_colors[NUM_TETRIS_COLORS] = 
@@ -24,11 +25,11 @@ tNeopixelContext neopixels;
 // set stuff up here
 void setUp(void) {
     neopixels = neopixel_Init(PIXEL_COUNT, NEOPIXEL_PIN);
-    clear_display(neopixels);
+    // clear_display(neopixels);
 }
 
 void tearDown(void) {
-    vTaskDelay(DELAY_1000MS * 3);
+    vTaskDelay(DELAY_1000MS);
     neopixel_Deinit(neopixels);
 }
 
@@ -43,8 +44,8 @@ TEST_CASE("test matrix orientation", "[display]")
     printf("refreshrate=%ld\n", refreshRate);
 
     // set topR to red
-    // tNeopixel topRightNeopix = {TOP_RIGHT_LED, getRGBFromCellColor(S_CELL_COLOR)};
-    // neopixel_SetPixel(neopixels, &topRightNeopix, 1);
+    tNeopixel topRightNeopix = {TOP_RIGHT_LED, getRGBFromCellColor(S_CELL_COLOR)};
+    neopixel_SetPixel(neopixels, &topRightNeopix, 1);
 
     // set botL to blue
     tNeopixel botLeftNeopix = {BOT_LEFT_LED, getRGBFromCellColor(J_CELL_COLOR)};
@@ -93,12 +94,6 @@ TEST_CASE("display empty TetrisBoard", "[display]") {
     display_board(neopixels, &tb);
 }
 
-TEST_CASE("test turn off very first pixel", "[display]") {
-
-    tNeopixel firstLED = (tNeopixel) {0, 0};
-    neopixel_SetPixel(neopixels, &firstLED, 1);
-
-}
 
 /**
  * create a outer red border around the display using a TetrisBoard
@@ -107,17 +102,43 @@ TEST_CASE("test turn off very first pixel", "[display]") {
 TEST_CASE("Display border", "[display]") {
     // create tetrisboard and fill outer pixels of board with color
     TetrisBoard tb = init_board();
+    setRingFromOutsideToColor(&tb, 0, Z_CELL_COLOR);
+    display_board(neopixels, &tb);
+    vTaskDelay(pdMS_TO_TICKS(500));
+
+    setRingFromOutsideToColor(&tb, 1, S_CELL_COLOR);
+    display_board(neopixels, &tb);
+    vTaskDelay(pdMS_TO_TICKS(500));
+
+    setRingFromOutsideToColor(&tb, 2, L_CELL_COLOR);
+    display_board(neopixels, &tb);
+    vTaskDelay(pdMS_TO_TICKS(500));
+
+    setRingFromOutsideToColor(&tb, 3, I_CELL_COLOR);
+    display_board(neopixels, &tb);
+    vTaskDelay(pdMS_TO_TICKS(500));
+}
+
+
+
+
+////////////////////////////////////////
+// helper functions
+////////////////////////////////////////
+
+void setRingFromOutsideToColor(TetrisBoard *tb, uint8_t rings_from_outside, int8_t color) {
+    assert(rings_from_outside < TETRIS_COLS / 2 && "rings_from_outside out of bounds!");
+
     // verticals
-    for (int row = 0; row < TETRIS_ROWS; row++) {
-        tb.board[row][0] = Z_PIECE;
-        tb.board[row][TETRIS_COLS-1] = Z_PIECE;
+    for (int row = rings_from_outside; row < TETRIS_ROWS - rings_from_outside; row++) {
+        tb->board[row][0+rings_from_outside] = color;
+        tb->board[row][TETRIS_COLS-1-rings_from_outside] = color;
     }
 
     // horizontals
-    for (int col = 0; col < TETRIS_COLS; col++) {
-        tb.board[0][col] = Z_PIECE;
-        tb.board[TETRIS_ROWS-1][col]= Z_PIECE;
+    for (int col = rings_from_outside; col < TETRIS_COLS - rings_from_outside; col++) {
+        tb->board[0+rings_from_outside][col] = color;
+        tb->board[TETRIS_ROWS-1-rings_from_outside][col]= color;
     }
 
-    display_board(neopixels, &tb);
 }

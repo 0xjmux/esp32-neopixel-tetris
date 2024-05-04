@@ -27,7 +27,7 @@ void app_main(void)
     // UNITY_END();
 
 
-    print_banner("Running all the registered tests");
+    print_banner("Running all tests");
     UNITY_BEGIN();
     unity_run_all_tests();
     UNITY_END();
@@ -40,9 +40,9 @@ void app_main(void)
 
 
     printf("Finished all tests - not showing interactive menu because it's broken on the ESP32S3\n");
-    while (1) {
-        // vTaskDelay(1000);
-    }
+    // while (1) {
+    //     vTaskDelay(1000);
+    // }
     exit(0);
 }
 

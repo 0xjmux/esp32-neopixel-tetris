@@ -15,13 +15,15 @@
     "esp_mac.h": "c",
     "neopixel.h": "c",
     "neopixel_display.h": "c",
-    "string.h": "c"
+    "string.h": "c",
+    "driver_tetris.h": "c",
+    "defs.h": "c"
   },
   "idf.adapterTargetName": "esp32s3",
   "idf.openOcdConfigs": [
     "board/esp32s3-builtin.cfg"
   ],
-  "idf.flashType": "UART",
+  "idf.flashType": "JTAG",
   "idf.port": "/dev/ttyACM0",
   "C_Cpp.errorSquiggles": "disabled",
   "C_Cpp.codeAnalysis.clangTidy.checks.disabled": [
