@@ -7,6 +7,8 @@
 
 #include "esp_log.h"        // used for debugging info statements
 
+static const uint8_t rowcol_to_LEDNum_LUT[32][8];
+inline static tNeopixel tPixelFromCellColor(unsigned int ledNum, int8_t tetris_cell_color);
 
 /**
  * Initialize and clear neopixel display
@@ -39,23 +41,20 @@ void clear_display(tNeopixelContext *neopixels) {
 
 }
 
-//void neopixel_display_setup(void) {
-//    neopixels = neopixel_Init(PIXEL_COUNT, NEOPIXEL_PIN);
-//    //tNeopixel contains {index, RGB} both uint32_t
-//
-//}
-
 void display_board(tNeopixelContext *neopixels, const TetrisBoard *tb) {
     // sanity check to make sure display is right size for board
     assert(TETRIS_COLS == DISPLAY_COLS && TETRIS_ROWS == DISPLAY_ROWS);
+    assert(neopixels != NULL);
+    ESP_LOGD(TAG, "Displaying board\n");
 
-    tNeopixel pixelArr[PIXEL_COUNT];
+    tNeopixel pixelArr[PIXEL_COUNT] = {0};
 
     for (int row = 0; row < DISPLAY_ROWS; row++) {
         for (int col = 0; col < DISPLAY_COLS; col++) {
             int ledNum = rowcol_to_LEDNum_LUT[row][col];
             assert(ledNum < PIXEL_COUNT && "LED number out of bounds");
-            pixelArr[ledNum] = (tNeopixel){ledNum, getRGBFromCellColor(tb->board[row][col])};
+            pixelArr[ledNum] = tPixelFromCellColor(ledNum, tb->board[row][col]);
+            // pixelArr[ledNum] = (tNeopixel){ledNum, getRGBFromCellColor(tb->board[row][col])};
         }
     }
     neopixel_SetPixel(neopixels, pixelArr, PIXEL_COUNT);
@@ -63,18 +62,12 @@ void display_board(tNeopixelContext *neopixels, const TetrisBoard *tb) {
 }
 
 
-// #define BG_COLOR_RGB  NP_RGB(0, 0, 0);             // background - off
-// const uint32_t cell_to_RGB_color[NUM_TETRIS_COLORS] = {
-    // NP_RGB(0, 50, 0), // S_CELL_COLOR, Green
-    // NP_RGB(50, 0, 0),  //Z_CELL_COLOR, Red
-    // NP_RGB(50, 0, 50),    //T_CELL_COLOR, Magenta
-    // NP_RGB(50, 25, 0),  //L_CELL_COLOR, Orange
-    // NP_RGB(0, 0, 50),    //J_CELL_COLOR, Blue
-    // NP_RGB(50, 50, 0),   //SQ_CELL_COLOR, Yellow
-    // NP_RGB(0, 50, 50),   //I_CELL_COLOR, light blue
-    // NP_RGB(0,0,0)       // BG color, off
-// };
-
+inline static tNeopixel tPixelFromCellColor(unsigned int ledNum, int8_t tetris_cell_color) {
+    tNeopixel temp = {0};
+    temp.index = ledNum;
+    temp.rgb = getRGBFromCellColor(tetris_cell_color);
+    return temp;
+}
 
 /**
  * Match tetris's `piece_colors` enum to 32bit neopixel color values
@@ -100,14 +93,13 @@ inline uint32_t getRGBFromCellColor(int8_t color) {
         default:
             assert(0 && "default case of getRGB should never be reached!");
     }
-    return 0;
 }
 
 
 /**
  * Convert [row][col] to LED number in 32x8 matrix
 */
-const uint8_t rowcol_to_LEDNum_LUT[32][8] =
+static const uint8_t rowcol_to_LEDNum_LUT[32][8] =
 {
   {  0,   1,   2,   3,   4,   5,   6,   7}, // row 0
   { 15,  14,  13,  12,  11,  10,   9,   8}, // row 1

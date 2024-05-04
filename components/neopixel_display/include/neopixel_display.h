@@ -27,7 +27,7 @@
 
 #define ARRAY_SIZE(x) (sizeof(x)/sizeof(x[0]))
 
-extern const uint8_t rowcol_to_LEDNum_LUT[32][8];
+// extern const uint8_t rowcol_to_LEDNum_LUT[34][8];
 
 tNeopixelContext init_neopixel_display(void);
 void deinit_neopixel_display(tNeopixelContext *neopixels);
