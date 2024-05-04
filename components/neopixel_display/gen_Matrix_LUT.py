@@ -27,14 +27,13 @@ for i in range(totalNumLEDs):
 
     currRow = i // displayWidthCols
     # print("currRow is : " + str(currRow))
-    # if row is even we print them forwards
+    # if row is even we print them backwards - first LED is on right side
     if currRow % 2 == 0:
+        tempArray[currRow][displayWidthCols - (i % displayWidthCols) - 1] = i
+
+    else:
         tempArray[currRow][i % displayWidthCols] = i
 
-    # if row is odd we print them backwards
-    else:
-        tempArray[currRow][displayWidthCols - (i % displayWidthCols) - 1] = i
-       
 
         # print(f"row {currRow} is even")
        # print(f"LED {i}", end='');
@@ -43,7 +42,7 @@ for i in range(totalNumLEDs):
 
 # print LUT out
 # first line:
-print(f"uint8_t rowcol_to_LEDNum_LUT[{ displayHeightRows }][{ displayWidthCols }] =") 
+print(f"uint8_t rowcol_to_LEDNum_LUT[{ displayHeightRows }][{ displayWidthCols }] =")
 print("{")
 rowi = 0
 for row in tempArray:
@@ -53,7 +52,7 @@ for row in tempArray:
             print(f'{int(item):3d}, ',end='')
         else:
             print(f'{int(item):3d}',end='')
-        
+
     print("}, // row " + str(rowi))
     rowi += 1
 
@@ -62,4 +61,3 @@ print("};")
 
 
 # if (i % displayWidthCols == 0): # end of a row, newline
-

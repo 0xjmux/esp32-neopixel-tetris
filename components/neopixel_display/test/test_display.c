@@ -8,8 +8,6 @@
 #include "npix_tetris_defs.h"
 #include "unity.h"
 
-#define DELAY_1000MS (1000 / portTICK_PERIOD_MS)
-
 static const int8_t example_board[32][8];
 static void setRingFromOutsideToColor(TetrisBoard *tb,
                                       uint8_t rings_from_outside, int8_t color);
@@ -30,7 +28,7 @@ void setUp(void) {
 }
 
 void tearDown(void) {
-  vTaskDelay(DELAY_1000MS);
+  vTaskDelay(pdMS_TO_TICKS(1000));
   neopixel_Deinit(neopixels);
 }
 

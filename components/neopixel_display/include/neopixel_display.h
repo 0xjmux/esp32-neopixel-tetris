@@ -19,8 +19,8 @@
 // LED numbers
 #define TOP_RIGHT_LED 0
 #define BOT_RIGHT_LED 255
-#define TOP_LEFT_LED 7
-#define BOT_LEFT_LED 248
+#define TOP_LEFT_LED  7
+#define BOT_LEFT_LED  248
 
 #define ARRAY_SIZE(x) (sizeof(x) / sizeof(x[0]))
 
@@ -34,5 +34,7 @@ void clear_display(tNeopixelContext *neopixels);
 uint32_t getRGBFromCellColor(int8_t color);
 
 void display_board(tNeopixelContext *neopixels, const TetrisBoard *tb);
+void display_pause_icon(tNeopixelContext *neopixels);
 
+void printTetrisBoardToLog(TetrisBoard *tb);
 #endif
