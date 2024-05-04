@@ -34,7 +34,7 @@
       "type": "cppdbg",
       "request": "launch",
       "cwd": "${workspaceFolder}/build",
-      "program": "${workspaceFolder}/build/espnow_example.elf",
+      "program": "${workspaceFolder}/build/esp32-neopixel-tetris.elf",
       // Could specify direct path to .espressif tools instead of the command
       "miDebuggerPath": "${command:espIdf.getXtensaGdb}",
       "setupCommands": [

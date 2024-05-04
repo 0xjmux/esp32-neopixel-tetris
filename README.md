@@ -27,3 +27,18 @@ These goals included:
 * Teach myself embedded test-driven development and embedded unit testing using techniques from James Greening's "Test-Driven Development for Embedded C" (link)
 * Make extensive use of an RTOS and interrupts to make program more performant. 
 Improve my skills using JTAG and OpenOCD/GDB to debug RTOS task-based programs.
+
+
+
+### Libraries
+```
+.
+├── neopixel                - zorxx/neopixel library, uses ESP32 I2S
+├── neopixel_display        - my driver for displaying tetris boards on the LED matrix
+└── tetris                  - my tetris game logic, 0xjmux/tetris
+```
+
+#### Library Modifications
+Libraries are added as submodules for depedencies to be correctly tracked. However, some modifications might be needed. 
+
+For Zorxx's [`neopixel` library](https://github.com/zorxx/neopixel) to work with my hardware, I had to change apply the fix mentioned in [this issue](https://github.com/zorxx/neopixel/issues/2). Without this fix, the first LED would be stuck as Green and unable to be changed. 
