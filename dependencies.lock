@@ -2,7 +2,7 @@ dependencies:
   0xjmux/tetris:
     component_hash: null
     source:
-      path: /home/jmux/Github/Neopixel-Matrix-Tetris-Project/neopix-tetris-repo-2/components/tetris
+      path: /home/jmux/Github/Neopixel-Matrix-Tetris-Project/esp32-neopixel-tetris/components/tetris
       type: local
     version: 1.0.0
   idf:
@@ -13,15 +13,15 @@ dependencies:
   neopixel:
     component_hash: null
     source:
-      path: /home/jmux/Github/Neopixel-Matrix-Tetris-Project/neopix-tetris-repo-2/components/neopixel
+      path: /home/jmux/Github/Neopixel-Matrix-Tetris-Project/esp32-neopixel-tetris/components/neopixel
       type: local
     version: 1.0.4
   neopixel_display:
     component_hash: null
     source:
-      path: /home/jmux/Github/Neopixel-Matrix-Tetris-Project/neopix-tetris-repo-2/components/neopixel_display
+      path: /home/jmux/Github/Neopixel-Matrix-Tetris-Project/esp32-neopixel-tetris/components/neopixel_display
       type: local
     version: '*'
-manifest_hash: abd2b873baa03f20b0d8c0a57a1a113f9c264c4e84ce67f7fd5f93f401bcfdcc
-target: esp32
+manifest_hash: 2090c2552e25192dee7cffe7718cbd8a306c8daafa3ba25389f9ecc2ac504285
+target: esp32s3
 version: 1.0.0
