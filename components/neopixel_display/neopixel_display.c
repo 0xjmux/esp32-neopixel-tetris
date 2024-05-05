@@ -6,8 +6,17 @@
 
 #include "esp_log.h"  // used for debugging info statements
 
+// local functions
+static void display_mask_over_board(tNeopixelContext *neopixels,
+                                    const uint8_t top_row,
+                                    const uint8_t *mask_2D,
+                                    const uint8_t mask_height,
+                                    const uint8_t leftmost_col);
 inline static tNeopixel tPixelFromCellColor(unsigned int ledNum,
                                             int8_t tetris_cell_color);
+
+static const uint8_t play_again_mask_height;
+static const uint8_t play_again_icon_mask[5];
 
 /**
  * Initialize and clear neopixel display
@@ -53,9 +62,9 @@ void display_board(tNeopixelContext *neopixels, const TetrisBoard *tb) {
     for (int col = 0; col < DISPLAY_COLS; col++) {
       int ledNum = rowcol_to_LEDNum_LUT[row][col];
       assert(ledNum < PIXEL_COUNT && "LED number out of bounds");
-      pixelArr[ledNum] = tPixelFromCellColor(ledNum, tb->board[row][col]);
-      // pixelArr[ledNum] = (tNeopixel){ledNum,
-      // getRGBFromCellColor(tb->board[row][col])};
+      // pixelArr[ledNum] = tPixelFromCellColor(ledNum, tb->board[row][col]);
+      pixelArr[ledNum] =
+          (tNeopixel){ledNum, getRGBFromCellColor(tb->board[row][col])};
     }
   }
   neopixel_SetPixel(neopixels, pixelArr, PIXEL_COUNT);
@@ -67,6 +76,11 @@ inline static tNeopixel tPixelFromCellColor(unsigned int ledNum,
   temp.index     = ledNum;
   temp.rgb       = getRGBFromCellColor(tetris_cell_color);
   return temp;
+}
+
+void display_play_again_icon(tNeopixelContext *neopixels) {
+  display_mask_over_board(neopixels, 2, play_again_icon_mask,
+                          play_again_mask_height, 0);
 }
 
 /**
@@ -84,6 +98,70 @@ void display_pause_icon(tNeopixelContext *neopixels) {
     Rpixel = (tNeopixel){rowcol_to_LEDNum_LUT[i][5], NP_RGB(50, 50, 50)};
     neopixel_SetPixel(neopixels, &Lpixel, 1);
     neopixel_SetPixel(neopixels, &Rpixel, 1);
+  }
+}
+
+/**
+ * Overlay symbols represented by bitmask over board contents (eg pause symbol)
+ *
+ * @param *neopixels tNeopixelContext   - neopixel context (display pixels)
+ * @param top_row uint8_t               - row to start drawing at
+ * @param mask_2D uint8_t                  - mask to overlay. A ptr to an array
+ * of 8 bit uints, which are used bitwise as the mask
+ * @param mask_height uint8_t           - number of rows in mask
+ * @param leftmost_col uint8_t          - leftmost column of mask (for displays
+ * wider than 8 bits, otherwise just 0)
+ */
+static void display_mask_over_board(tNeopixelContext *neopixels,
+                                    const uint8_t top_row,
+                                    const uint8_t *mask_2D,
+                                    const uint8_t mask_height,
+                                    const uint8_t leftmost_col) {
+  uint8_t curr_row = top_row;
+  uint8_t bits[DISPLAY_MASK_WIDTH];
+
+  // largest possible pixelArr needed
+  tNeopixel pixelArr[DISPLAY_COLS * mask_height];
+  uint16_t num_bits_set = 0;
+
+  assert(mask_height < DISPLAY_ROWS);
+  // for each row in mask
+  // for(int row = top_row; row < top_row + mask_height; row++) {
+  for (int i = 0; i < mask_height; i++) {
+    curr_row = top_row + i;
+
+    // get bitmask for this row
+    getArrayOfBitsFromMask(mask_2D[i], bits, DISPLAY_MASK_WIDTH);
+    // for each bit in mask
+    for (int col = leftmost_col; col < leftmost_col + DISPLAY_MASK_WIDTH;
+         col++) {
+      // if bit is present, add to pixelArr
+      if (bits[col]) {
+        // set current end of pixelArr accordingly
+        pixelArr[num_bits_set] = (tNeopixel){
+            rowcol_to_LEDNum_LUT[curr_row][col], NP_RGB(100, 100, 100)};
+        num_bits_set++;
+      }
+    }
+  }
+
+  neopixel_SetPixel(neopixels, pixelArr, num_bits_set);
+}
+
+/**
+ * Converts bitwise contents of 1D `mask` to an array *bits
+ * @param in_mask const uint8_t - single uint8_t holding 8 columns
+ * @param *bits - bit array result stored in
+ * @param mask_width - width of mask row
+ *
+ */
+inline void getArrayOfBitsFromMask(const uint8_t in_mask, uint8_t *bits,
+                                   const uint8_t mask_width) {
+  uint8_t mask = in_mask;
+
+  for (int8_t bit = mask_width - 1; bit >= 0; bit--) {
+    bits[bit] = mask & 1;
+    mask >>= 1;
   }
 }
 
@@ -113,37 +191,9 @@ inline uint32_t getRGBFromCellColor(int8_t color) {
   }
 }
 
-/**
- * Print board state to ESP_LOGI
- */
-void printTetrisBoardToLog(TetrisBoard *tb) {
-  // draw existing pieces on board
-  printf("Highest occupied cell: %d\n", tb->highest_occupied_cell);
-
-  // print col numbers
-  printf("  ");
-  for (int i = 0; i < TETRIS_COLS; i++) printf("%-2d  ", i);
-  printf("\n");
-
-  // print separator
-  printf("   ");
-  for (int i = 0; i < TETRIS_COLS; i++) printf("----");
-  printf("----\n");
-
-  // print board itself
-  for (int i = 0; i < TETRIS_ROWS; i++) {
-    // print row number
-    printf("%-3d| ", i);
-    for (int j = 0; j < TETRIS_COLS; j++) {
-      if (tb->board[i][j] >= 0) {
-        printf("%-3d ", tb->board[i][j]);
-      } else {
-        printf("    ");
-      }
-    }
-    printf("|\n");
-  }
-}
+// these LUTs and bitmasks are only valid for 8bit wide matrices.
+//      Matrices of other sizes would require different constants.
+#if DISPLAY_COLS == 8
 
 /**
  * Convert [row][col] to LED number in 32x8 matrix
@@ -182,3 +232,40 @@ const uint8_t rowcol_to_LEDNum_LUT[32][8] = {
     {247, 246, 245, 244, 243, 242, 241, 240},  // row 30
     {248, 249, 250, 251, 252, 253, 254, 255},  // row 31
 };
+
+static const uint8_t play_again_mask_height  = 5;
+static const uint8_t play_again_icon_mask[5] = {
+    0b01000010, 0b01100101, 0b01110001, 0b01100010, 0b01000010};
+#endif
+
+/**
+ * Print board state to ESP_LOGI
+ */
+void printTetrisBoardToLog(TetrisBoard *tb) {
+  // draw existing pieces on board
+  printf("Highest occupied cell: %d\n", tb->highest_occupied_cell);
+
+  // print col numbers
+  printf("  ");
+  for (int i = 0; i < TETRIS_COLS; i++) printf("%-2d  ", i);
+  printf("\n");
+
+  // print separator
+  printf("   ");
+  for (int i = 0; i < TETRIS_COLS; i++) printf("----");
+  printf("----\n");
+
+  // print board itself
+  for (int i = 0; i < TETRIS_ROWS; i++) {
+    // print row number
+    printf("%-3d| ", i);
+    for (int j = 0; j < TETRIS_COLS; j++) {
+      if (tb->board[i][j] >= 0) {
+        printf("%-3d ", tb->board[i][j]);
+      } else {
+        printf("    ");
+      }
+    }
+    printf("|\n");
+  }
+}

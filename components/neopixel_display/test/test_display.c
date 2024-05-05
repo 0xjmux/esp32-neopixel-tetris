@@ -1,5 +1,7 @@
 #include <string.h>
 
+#define TEST_DISPLAY 1
+
 #include "esp_log.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/timers.h"  // for vTaskDelay
@@ -8,9 +10,21 @@
 #include "npix_tetris_defs.h"
 #include "unity.h"
 
+/**
+ * Panel information:
+ * for my 8x32 panel, LED #0 is at the top right of the display, and then
+ * it winds back and forth horizontally all the way down.
+ * LED 255 is at the bottom right of the display
+ */
+#define TOP_RIGHT_LED 0
+#define BOT_RIGHT_LED 255
+#define TOP_LEFT_LED  7
+#define BOT_LEFT_LED  248
+
 static const int8_t example_board[32][8];
 static void setRingFromOutsideToColor(TetrisBoard *tb,
                                       uint8_t rings_from_outside, int8_t color);
+void printArrayContents(const uint8_t *array, const uint8_t length);
 
 // allow iterating through cell colors
 const int8_t all_cell_colors[NUM_TETRIS_COLORS] = {
@@ -22,15 +36,47 @@ const int8_t all_cell_colors[NUM_TETRIS_COLORS] = {
 tNeopixelContext neopixels;
 
 // set stuff up here
-void setUp(void) {
-  neopixels = neopixel_Init(PIXEL_COUNT, NEOPIXEL_PIN);
-  // clear_display(neopixels);
+void setUp(void) { neopixels = neopixel_Init(PIXEL_COUNT, NEOPIXEL_PIN); }
+
+void tearDown(void) { neopixel_Deinit(neopixels); }
+
+////////////////////////////////////////
+// internal tests
+////////////////////////////////////////
+TEST_CASE("test getRGBFromCellColor", "[display]") {
+  // for each cell color
+  TEST_ASSERT_EQUAL(NP_RGB(0, 50, 0), getRGBFromCellColor(S_CELL_COLOR));
+  TEST_ASSERT_EQUAL(NP_RGB(50, 0, 0), getRGBFromCellColor(Z_CELL_COLOR));
+  TEST_ASSERT_EQUAL(NP_RGB(50, 0, 50), getRGBFromCellColor(T_CELL_COLOR));
+  TEST_ASSERT_EQUAL(NP_RGB(50, 25, 0), getRGBFromCellColor(L_CELL_COLOR));
+  TEST_ASSERT_EQUAL(NP_RGB(0, 0, 50), getRGBFromCellColor(J_CELL_COLOR));
+  TEST_ASSERT_EQUAL(NP_RGB(50, 50, 0), getRGBFromCellColor(SQ_CELL_COLOR));
+  TEST_ASSERT_EQUAL(NP_RGB(0, 50, 50), getRGBFromCellColor(I_CELL_COLOR));
+  TEST_ASSERT_EQUAL(NP_RGB(0, 0, 0), getRGBFromCellColor(BG_COLOR));
 }
 
-void tearDown(void) {
-  vTaskDelay(pdMS_TO_TICKS(1000));
-  neopixel_Deinit(neopixels);
+TEST_CASE("Test getArrayOfBitsFromMask", "[internal]") {
+#define MASK_WIDTH 8
+
+  uint8_t in_mask = 0b01110001;
+  uint8_t result_bits[MASK_WIDTH];
+  uint8_t expected_bits[MASK_WIDTH] = {0, 1, 1, 1, 0, 0, 0, 1};
+  getArrayOfBitsFromMask(in_mask, result_bits, MASK_WIDTH);
+
+  printf("getArrayofBitsFromMask: Input (expected) was ");
+  printArrayContents(expected_bits, MASK_WIDTH);
+  printf(", output was: ");
+  printArrayContents(result_bits, MASK_WIDTH);
+  printf("\n");
+
+  TEST_ASSERT_EQUAL_UINT8_ARRAY_MESSAGE(
+      expected_bits, result_bits, MASK_WIDTH,
+      "getArrayOfBitsFromMask returned incorrect result");
 }
+
+////////////////////////////////////////
+/// tests requiring looking at the display
+////////////////////////////////////////
 
 /**
  * Display red in top right corner, blue in bot left
@@ -48,9 +94,14 @@ TEST_CASE("test matrix orientation", "[display]") {
   // set botL to blue
   tNeopixel botLeftNeopix = {BOT_LEFT_LED, getRGBFromCellColor(J_CELL_COLOR)};
   neopixel_SetPixel(neopixels, &botLeftNeopix, 1);
+
+  vTaskDelay(pdMS_TO_TICKS(1000));
 }
 
-TEST_CASE("test clear display", "[display]") { clear_display(neopixels); }
+TEST_CASE("test clear display", "[display]") {
+  clear_display(neopixels);
+  vTaskDelay(pdMS_TO_TICKS(1000));
+}
 
 /**
  * Show rainbow horizontal stripes down display (each row different color)
@@ -67,18 +118,7 @@ TEST_CASE("test Display Colors", "[display]") {
     }
     neopixel_SetPixel(neopixels, pixelArr, DISPLAY_COLS);
   }
-}
-
-TEST_CASE("test getRGBFromCellColor", "[display]") {
-  // for each cell color
-  TEST_ASSERT_EQUAL(NP_RGB(0, 50, 0), getRGBFromCellColor(S_CELL_COLOR));
-  TEST_ASSERT_EQUAL(NP_RGB(50, 0, 0), getRGBFromCellColor(Z_CELL_COLOR));
-  TEST_ASSERT_EQUAL(NP_RGB(50, 0, 50), getRGBFromCellColor(T_CELL_COLOR));
-  TEST_ASSERT_EQUAL(NP_RGB(50, 25, 0), getRGBFromCellColor(L_CELL_COLOR));
-  TEST_ASSERT_EQUAL(NP_RGB(0, 0, 50), getRGBFromCellColor(J_CELL_COLOR));
-  TEST_ASSERT_EQUAL(NP_RGB(50, 50, 0), getRGBFromCellColor(SQ_CELL_COLOR));
-  TEST_ASSERT_EQUAL(NP_RGB(0, 50, 50), getRGBFromCellColor(I_CELL_COLOR));
-  TEST_ASSERT_EQUAL(NP_RGB(0, 0, 0), getRGBFromCellColor(BG_COLOR));
+  vTaskDelay(pdMS_TO_TICKS(1000));
 }
 
 /**
@@ -115,7 +155,14 @@ TEST_CASE("Display example_board", "[display]") {
   memcpy(&tb.board, example_board, sizeof(example_board));
   display_board(neopixels, &tb);
 
-  vTaskDelay(pdMS_TO_TICKS(1000));
+  vTaskDelay(pdMS_TO_TICKS(2000));
+}
+
+TEST_CASE("Test Display play again mask over board", "[display]") {
+  display_play_again_icon(neopixels);
+  // display_mask_over_board(neopixels, 2, play_again_icon_mask, 5, 0);
+
+  vTaskDelay(pdMS_TO_TICKS(2000));
 }
 
 ////////////////////////////////////////
@@ -141,6 +188,19 @@ static void setRingFromOutsideToColor(TetrisBoard *tb,
     tb->board[0 + rings_from_outside][col]               = color;
     tb->board[TETRIS_ROWS - 1 - rings_from_outside][col] = color;
   }
+}
+
+/**
+ * Prints array contents without newline
+ * @param *array unsigned int
+ * @param length unsigned int
+ */
+void printArrayContents(const uint8_t *array, const uint8_t length) {
+  printf("{ ");
+  for (int i = 0; i < length - 1; i++) {
+    printf("%d, ", array[i]);
+  }
+  printf("%d }", array[length - 1]);
 }
 
 // clang-format off

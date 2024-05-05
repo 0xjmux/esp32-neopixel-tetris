@@ -9,32 +9,28 @@
 
 #define NUM_TETRIS_COLORS NUM_TETROMINOS + 1
 
-/**
- * Panel information:
- * for my 8x32 panel, LED #0 is at the top right of the display, and then
- * it winds back and forth horizontally all the way down.
- * LED 255 is at the bottom right of the display
- */
+// all display masks use uint8_t, so without a refactor the widest mask that can
+//  be used is 8 cells wide
+#define DISPLAY_MASK_WIDTH 8
 
-// LED numbers
-#define TOP_RIGHT_LED 0
-#define BOT_RIGHT_LED 255
-#define TOP_LEFT_LED  7
-#define BOT_LEFT_LED  248
-
-#define ARRAY_SIZE(x) (sizeof(x) / sizeof(x[0]))
-
+// Lookup table for converting [row][col] of TetrisBoard to LEDs in the matrix.
+//  Tables of arbitrary size forcan be generated using `gen_Matrix_LUT.py`
 extern const uint8_t rowcol_to_LEDNum_LUT[32][8];
 
 tNeopixelContext init_neopixel_display(void);
 void deinit_neopixel_display(tNeopixelContext *neopixels);
 
+void display_board(tNeopixelContext *neopixels, const TetrisBoard *tb);
 void clear_display(tNeopixelContext *neopixels);
 
 uint32_t getRGBFromCellColor(int8_t color);
 
-void display_board(tNeopixelContext *neopixels, const TetrisBoard *tb);
+void display_play_again_icon(tNeopixelContext *neopixels);
 void display_pause_icon(tNeopixelContext *neopixels);
 
 void printTetrisBoardToLog(TetrisBoard *tb);
+
+void getArrayOfBitsFromMask(const uint8_t in_mask, uint8_t *bits,
+                            const uint8_t mask_width);
+
 #endif
