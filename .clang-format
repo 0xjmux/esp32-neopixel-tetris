@@ -1,8 +1,13 @@
 ---
+BasedOnStyle: llvm
+IndentWidth: 2
+---
 Language: Cpp
 BasedOnStyle: Google
-IndentWidth: 2
 AlignConsecutiveBitFields: true
 AlignConsecutiveMacros: true
 AlignConsecutiveAssignments: true
+---
+Language: Json
+BasedOnStyle: llvm
 ...

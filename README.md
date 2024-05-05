@@ -1,5 +1,4 @@
 # ESP32 Neopixel Tetris
-
 Tetris playable on a WS2812B LED matrices via an ESP-Now remote.
 
 #### Tetris Game

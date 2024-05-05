@@ -2,7 +2,7 @@ name: Build ESP32 Neopixel Tetris
 on:
   push:
 jobs:
-  build:
+  Build-Main-ESP32S3:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout repo
@@ -10,8 +10,22 @@ jobs:
       with:
         submodules: 'recursive'
     # https://github.com/espressif/esp-idf-ci-action
-    - name: esp-idf build
+    - name: ESP-IDF build main ESP32S3
       uses: espressif/esp-idf-ci-action@v1
       with:
         target: esp32s3
         path: './'
+
+  Build-Test-ESP32S3:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        submodules: 'recursive'
+    # https://github.com/espressif/esp-idf-ci-action
+    - name: ESP-IDF build test ESP32S3
+      uses: espressif/esp-idf-ci-action@v1
+      with:
+        target: esp32s3
+        path: './test'
