@@ -6,7 +6,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout repo
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
       with:
         submodules: 'recursive'
     # https://github.com/espressif/esp-idf-ci-action
@@ -20,7 +20,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout repo
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
       with:
         submodules: 'recursive'
     # https://github.com/espressif/esp-idf-ci-action
@@ -29,3 +29,17 @@ jobs:
       with:
         target: esp32s3
         path: './test'
+
+  Build-Main-ESP32S2:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v4
+      with:
+        submodules: 'recursive'
+    # https://github.com/espressif/esp-idf-ci-action
+    - name: ESP-IDF build main ESP32S3
+      uses: espressif/esp-idf-ci-action@v1
+      with:
+        target: esp32s2
+        path: './'
