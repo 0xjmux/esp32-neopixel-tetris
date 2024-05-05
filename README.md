@@ -15,7 +15,7 @@ As such, this project runs on [my iot_leddriver PCB](https://github.com/0xjmux/i
 
 
 ### Project Goals
-I designed this project to target areas of my skillset which I felt could use additional development. I wanted a better understanding of the entire embedded development toolchain and process, and needed a way to fill in the gaps between what school teachces and the skills that are required to be a competent embedded software engineer.
+I designed this project to target areas of my skillset which I felt could use additional development. I wanted a better understanding of the entire embedded development toolchain and process, and needed a way to fill in the gaps between what school teaches and the skills that are required to be a competent embedded software engineer.
 
 These goals included:
 * Write Tetris game code from scratch with minimal dependencies for embedded platforms using cross-platform development techniques. Code must be testable without hardware to expedite iteration and testing.
