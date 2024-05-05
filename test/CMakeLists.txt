@@ -10,7 +10,7 @@ cmake_minimum_required(VERSION 3.16)
 
 # Add newly added components to one of these lines:
 # 1. Add here if the component is compatible with IDF >= v4.3
-set(EXTRA_COMPONENT_DIRS "../components" "../managed_components")
+set(EXTRA_COMPONENT_DIRS "../components" )
 
 set(TEST_COMPONENTS "neopixel_display" CACHE STRING "List of components to test")
 
