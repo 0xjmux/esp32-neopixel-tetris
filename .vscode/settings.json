@@ -17,7 +17,10 @@
     "neopixel_display.h": "c",
     "string.h": "c",
     "driver_tetris.h": "c",
-    "defs.h": "c"
+    "defs.h": "c",
+    "esp_heap_caps.h": "c",
+    "esp_system.h": "c",
+    "stdbool.h": "c"
   },
   "idf.adapterTargetName": "esp32s3",
   "idf.openOcdConfigs": [
