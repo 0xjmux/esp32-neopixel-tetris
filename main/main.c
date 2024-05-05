@@ -8,16 +8,17 @@
 #include "esp_log.h"
 #include "esp_netif.h"
 #include "esp_now.h"
+#include "esp_sleep.h"  // board poweroff on gameover
 #include "esp_wifi.h"
-#include "espnow_remote.h"
+#include "espnow_remote.h"  // my remote driver
 #include "freertos/FreeRTOS.h"
 #include "freertos/semphr.h"
 #include "freertos/timers.h"
 #include "neopixel.h"          // fast neopixel library
 #include "neopixel_display.h"  // my neopixel array driver
-#include "npix_tetris_defs.h"
+#include "npix_tetris_defs.h"  // project-wide definitions
 #include "nvs_flash.h"
-#include "tetris.h"
+#include "tetris.h"  // tetris game library
 
 static SemaphoreHandle_t mutex;
 
@@ -31,15 +32,20 @@ void tetris_game_loop_task(void *pvParameter) {
   char button_name_str[SHORT_STR_LEN];
   bool game_paused = false;
 
-  tNeopixelContext *neopixels = neopixel_Init(PIXEL_COUNT, NEOPIXEL_PIN);
+  TetrisGame *tg;
+  tNeopixelContext *neopixels;
+
+// logic for restarting game
+restart_game:
+  neopixels = neopixel_Init(PIXEL_COUNT, NEOPIXEL_PIN);
   if (neopixels == NULL) {
     ESP_LOGE(TAG, "Failed to allocate tNeopixelContext!!\n");
     assert(0 && "failed to allocate tNeoPixelContext!");
   }
 
-  TetrisGame *tg;
   tg                    = create_game();
   enum player_move move = T_NONE;
+
   create_rand_piece(tg);  // create first piece
 
   clear_display(neopixels);
@@ -134,16 +140,47 @@ void tetris_game_loop_task(void *pvParameter) {
     vTaskDelay(pdMS_TO_TICKS(15));
   }
 
-  ESP_LOGI(TAG, "Game over! Level=%ld, Score=%ld\n", tg->level, tg->score);
   display_board(neopixels, &tg->active_board);
   printTetrisBoardToLog(&tg->active_board);
+  ESP_LOGI(TAG, "Game over! Level=%ld, Score=%ld\n", tg->level, tg->score);
   // wait for print to finish before aborting
-  vTaskDelay(pdMS_TO_TICKS(800));
+  vTaskDelay(pdMS_TO_TICKS(300));
+  display_play_again_icon(neopixels);
+
+  ESP_LOGI(TAG, "Waiting for user input on play again:");
+  enum play_again_enum { WAIT_RESPOSNE, PLAY_AGAIN, GOTO_SLEEP };
+  enum play_again_enum play_again_resp = WAIT_RESPOSNE;
+  while (play_again_resp == WAIT_RESPOSNE) {
+    switch (buttons_state.button_val) {
+      case (WIZMOTE_BUTTON_OFF):
+        ESP_LOGI(TAG, "Quitting game, putting ESP to sleep now");
+        play_again_resp = GOTO_SLEEP;
+        break;
+      case (WIZMOTE_BUTTON_ON || WIZMOTE_BUTTON_NIGHT):
+        ESP_LOGI(TAG, "New game requested!");
+        play_again_resp = PLAY_AGAIN;
+        break;
+      default:
+        vTaskDelay(pdMS_TO_TICKS(150));
+        break;
+    }
+
+    buttons_state = get_buttons_state();
+    reset_internal_buttons_state();
+  }
 
   // if we're here, game is over; dealloc tg
   end_game(tg);
+  clear_display(neopixels);
   neopixel_Deinit(neopixels);
-  assert(0 && "reached end of game loop!");
+  if (play_again_resp == GOTO_SLEEP) {
+    // Deep sleep requires a hard reset/power cycle to exit
+    esp_deep_sleep_start();
+  }
+
+  goto restart_game;
+
+  assert(0 && "function should not exit");
 }
 
 void app_main(void) {
