@@ -5,7 +5,7 @@ Tetris playable on a WS2812B LED matrices via an ESP-Now remote.
 The Tetris game code became involved enough that I moved it to its own repository at [0xjmux/tetris](https://github.com/0xjmux/tetris). Since I designed it as a single-header library, this project only needs to import `tetris.h/tetris.c`, but I wanted to minimize the presence of all the other code for the x86 Linux driver, Unit tests, helpers, and CI in this repo.
 
 #### Remote
-I decided to use the [Wizmote](https://www.wizconnected.com/en-us/p/accessory-wizmote/046677603595) as a game controller because of its low cost and use of Espressif's ESP-NOW protocol, which I thought would be easy to receive via the ESP32's builtin antenna. This ended up being harder than anticipated, but does work relatively well.
+I decided to use the [Wizmote](https://www.wizconnected.com/en-us/p/accessory-wizmote/046677603595) as a game controller because of its low cost and use of Espressif's ESP-NOW protocol, which I thought would be easy to receive via the ESP32's builtin antenna. This ended up being more difficult than anticipated, but does work relatively well - especially considering that I'm using a glorified lightswitch as my game controller.
 
 
 #### Hardware
@@ -47,8 +47,3 @@ Improve my skills using JTAG and OpenOCD/GDB to debug RTOS task-based programs.
 ├── neopixel_display        - my driver for displaying tetris boards on the LED matrix
 └── tetris                  - my tetris game logic, 0xjmux/tetris
 ```
-
-#### Library Modifications
-Libraries are added as submodules for depedencies to be correctly tracked. However, some modifications might be needed.
-
-For Zorxx's [`neopixel` library](https://github.com/zorxx/neopixel) to work with my hardware, I had to change apply the fix mentioned in [this issue](https://github.com/zorxx/neopixel/issues/2). Without this fix, the first LED would be stuck as Green and unable to be changed.

@@ -15,8 +15,10 @@ static void display_mask_over_board(tNeopixelContext *neopixels,
 inline static tNeopixel tPixelFromCellColor(unsigned int ledNum,
                                             int8_t tetris_cell_color);
 
-static const uint8_t play_again_mask_height;
-static const uint8_t play_again_icon_mask[5];
+// play_again icon shown at end of game
+static const uint8_t play_again_mask_height  = 5;
+static const uint8_t play_again_icon_mask[5] = {
+    0b01000010, 0b01100101, 0b01110001, 0b01100010, 0b01000010};
 
 /**
  * Initialize and clear neopixel display
@@ -24,12 +26,17 @@ static const uint8_t play_again_icon_mask[5];
  */
 tNeopixelContext init_neopixel_display(void) {
   tNeopixelContext neopixels = neopixel_Init(PIXEL_COUNT, NEOPIXEL_PIN);
+  if (neopixels == NULL) {
+    ESP_LOGE(TAG, "Failed to allocate tNeopixelContext!!\n");
+    assert(0 && "failed to allocate tNeoPixelContext!");
+  }
   clear_display(neopixels);
   ESP_LOGI(TAG, "initialized and cleared neopixel display");
   return neopixels;
 }
 
 void deinit_neopixel_display(tNeopixelContext *neopixels) {
+  clear_display(neopixels);
   neopixel_Deinit(neopixels);
 }
 
@@ -80,22 +87,26 @@ inline static tNeopixel tPixelFromCellColor(unsigned int ledNum,
 
 void display_play_again_icon(tNeopixelContext *neopixels) {
   display_mask_over_board(neopixels, 2, play_again_icon_mask,
-                          play_again_mask_height, 0);
+                          play_again_mask_height, DISPLAY_MASK_LEFTMOST_COL);
 }
 
 /**
- * Draw pause icon on display when game is paused
+ * Draw pause icon on display when game is paused.
+ * @note function is adaptable to larger screen widths
  */
 void display_pause_icon(tNeopixelContext *neopixels) {
   const uint8_t pause_icon_starting_height = 3;
   const uint8_t pause_icon_height          = 4;
+  const uint8_t mid_col                    = DISPLAY_COLS / 2;
   tNeopixel Lpixel                         = {0};
   tNeopixel Rpixel                         = {0};
 
   for (int i = pause_icon_starting_height;
        i < pause_icon_height + pause_icon_starting_height; i++) {
-    Lpixel = (tNeopixel){rowcol_to_LEDNum_LUT[i][3], NP_RGB(50, 50, 50)};
-    Rpixel = (tNeopixel){rowcol_to_LEDNum_LUT[i][5], NP_RGB(50, 50, 50)};
+    Lpixel =
+        (tNeopixel){rowcol_to_LEDNum_LUT[i][mid_col - 1], NP_RGB(50, 50, 50)};
+    Rpixel =
+        (tNeopixel){rowcol_to_LEDNum_LUT[i][mid_col + 1], NP_RGB(50, 50, 50)};
     neopixel_SetPixel(neopixels, &Lpixel, 1);
     neopixel_SetPixel(neopixels, &Rpixel, 1);
   }
@@ -117,6 +128,9 @@ static void display_mask_over_board(tNeopixelContext *neopixels,
                                     const uint8_t *mask_2D,
                                     const uint8_t mask_height,
                                     const uint8_t leftmost_col) {
+  // make sure leftmost_col value isn't out of range for this display
+  assert((leftmost_col == 0 && DISPLAY_COLS < 10) || DISPLAY_COLS >= 10);
+
   uint8_t curr_row = top_row;
   uint8_t bits[DISPLAY_MASK_WIDTH];
 
@@ -151,8 +165,8 @@ static void display_mask_over_board(tNeopixelContext *neopixels,
 /**
  * Converts bitwise contents of 1D `mask` to an array *bits
  * @param in_mask const uint8_t - single uint8_t holding 8 columns
- * @param *bits - bit array result stored in
- * @param mask_width - width of mask row
+ * @param *bits - resulting bit array result
+ * @param mask_width - width of mask - limited by datatype
  *
  */
 inline void getArrayOfBitsFromMask(const uint8_t in_mask, uint8_t *bits,
@@ -167,6 +181,7 @@ inline void getArrayOfBitsFromMask(const uint8_t in_mask, uint8_t *bits,
 
 /**
  * Match tetris's `piece_colors` enum to 32bit neopixel color values
+ * @param color - value stored in TetrisBoard Cell
  */
 inline uint32_t getRGBFromCellColor(int8_t color) {
   switch (color) {
@@ -233,13 +248,11 @@ const uint8_t rowcol_to_LEDNum_LUT[32][8] = {
     {248, 249, 250, 251, 252, 253, 254, 255},  // row 31
 };
 
-static const uint8_t play_again_mask_height  = 5;
-static const uint8_t play_again_icon_mask[5] = {
-    0b01000010, 0b01100101, 0b01110001, 0b01100010, 0b01000010};
 #endif
 
 /**
- * Print board state to ESP_LOGI
+ * Print board state to stdout. Used in main at end of game
+ * to view board state
  */
 void printTetrisBoardToLog(TetrisBoard *tb) {
   // draw existing pieces on board

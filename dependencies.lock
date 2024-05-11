@@ -15,13 +15,13 @@ dependencies:
     source:
       path: /home/jmux/Github/Neopixel-Matrix-Tetris-Project/esp32-neopixel-tetris/components/neopixel
       type: local
-    version: 1.0.4
+    version: 1.0.5
   neopixel_display:
     component_hash: null
     source:
       path: /home/jmux/Github/Neopixel-Matrix-Tetris-Project/esp32-neopixel-tetris/components/neopixel_display
       type: local
     version: '*'
-manifest_hash: 2090c2552e25192dee7cffe7718cbd8a306c8daafa3ba25389f9ecc2ac504285
+manifest_hash: bb8fb8a3299d27e7c9bea6ddb5e85593d5e0dc20387ad524e4a358f6c60d3b7f
 target: esp32s3
 version: 1.0.0

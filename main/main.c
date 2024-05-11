@@ -35,13 +35,9 @@ void tetris_game_loop_task(void *pvParameter) {
   TetrisGame *tg;
   tNeopixelContext *neopixels;
 
-// logic for restarting game
+// logic for restarting game [goto is a necessary evil here :(]
 restart_game:
-  neopixels = neopixel_Init(PIXEL_COUNT, NEOPIXEL_PIN);
-  if (neopixels == NULL) {
-    ESP_LOGE(TAG, "Failed to allocate tNeopixelContext!!\n");
-    assert(0 && "failed to allocate tNeoPixelContext!");
-  }
+  neopixels = init_neopixel_display();
 
   tg                    = create_game();
   enum player_move move = T_NONE;
@@ -87,7 +83,6 @@ restart_game:
     switch (buttons_state.button_val) {
       case (WIZMOTE_BUTTON_ON):  //
         strcpy(button_name_str, "ON");
-        display_board(neopixels, &tg->active_board);
         break;
       case (WIZMOTE_BUTTON_OFF):  // QUIT
         strcpy(button_name_str, "QUIT (off)");
@@ -131,12 +126,6 @@ restart_game:
     buttons_state = get_buttons_state();
     reset_internal_buttons_state();
 
-    // if we received a move
-    // if (move != T_NONE) {
-    //     ESP_LOGI(TAG, "Game loop received button/move %s", button_name_str);
-    // }
-
-    // delay
     vTaskDelay(pdMS_TO_TICKS(15));
   }
 
@@ -171,8 +160,8 @@ restart_game:
 
   // if we're here, game is over; dealloc tg
   end_game(tg);
-  clear_display(neopixels);
-  neopixel_Deinit(neopixels);
+  deinit_neopixel_display(neopixels);
+
   if (play_again_resp == GOTO_SLEEP) {
     // Deep sleep requires a hard reset/power cycle to exit
     esp_deep_sleep_start();
@@ -180,7 +169,7 @@ restart_game:
 
   goto restart_game;
 
-  assert(0 && "function should not exit");
+  assert(0 && "task functions should not exit");
 }
 
 void app_main(void) {

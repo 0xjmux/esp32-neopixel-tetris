@@ -12,6 +12,10 @@
 // all display masks use uint8_t, so without a refactor the widest mask that can
 //  be used is 8 cells wide
 #define DISPLAY_MASK_WIDTH 8
+// this defines the leftmost cell for masks. On implementations with larger
+// widths,
+//  this would need to be changed; for DISPLAY_COLS < 10 0 is ideal.
+#define DISPLAY_MASK_LEFTMOST_COL 0
 
 // Lookup table for converting [row][col] of TetrisBoard to LEDs in the matrix.
 //  Tables of arbitrary size forcan be generated using `gen_Matrix_LUT.py`

@@ -80,7 +80,6 @@ TEST_CASE("Test getArrayOfBitsFromMask", "[internal]") {
 
 /**
  * Display red in top right corner, blue in bot left
- * This will be manually checked by a human
  */
 TEST_CASE("test matrix orientation", "[display]") {
   uint32_t refreshRate = neopixel_GetRefreshRate(neopixels);

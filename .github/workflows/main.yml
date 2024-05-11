@@ -38,7 +38,7 @@ jobs:
       with:
         submodules: 'recursive'
     # https://github.com/espressif/esp-idf-ci-action
-    - name: ESP-IDF build main ESP32S3
+    - name: ESP-IDF build
       uses: espressif/esp-idf-ci-action@v1
       with:
         target: esp32s2
