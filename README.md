@@ -1,6 +1,11 @@
 # ESP32 Neopixel Tetris
 Tetris playable on a WS2812B LED matrices via an ESP-Now remote.
 
+
+<p align="center">
+<img alt="Image of game over on LED matrix" src="files/neopixel_tetris_game_over.png" width="300" />
+</p>
+
 #### Tetris Game
 The Tetris game code became involved enough that I moved it to its own repository at [0xjmux/tetris](https://github.com/0xjmux/tetris). Since I designed it as a single-header library, this project only needs to import `tetris.h/tetris.c`, but I wanted to minimize the presence of all the other code for the x86 Linux driver, Unit tests, helpers, and CI in this repo.
 
